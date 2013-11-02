@@ -1,0 +1,59 @@
+for (Iterator<IPFEM2DElement> it = elements.iterator(); it.hasNext();) {
+            PFEM2DTria tria = (PFEM2DTria) it.next();
+
+            double quality = tria.getQuality();
+            System.out.println("tria " + tria.getId() + ", quality=" + quality);
+
+            if (quality < 25) {
+                triaPoorQuality.add(tria);
+                System.out.println("   adding tria " + tria.getId());
+            }
+
+            PFEM2DEdge[] edgeTria = new PFEM2DEdge[3];
+            edgeTria = tria.getAllEdges(7).toArray(edgeTria);
+
+
+
+            for (int i = 0; i < 3; i++) {
+                PFEM2DEdge pFEM2DEdge = edgeTria[i];
+
+                boolean flag = false;
+
+                for (Iterator<PFEM2DEdge> it2 = listEdge.iterator(); it2.hasNext() && !flag;) {
+                    PFEM2DEdge pFEM2DEdge1 = it2.next();
+                    flag = flag || (pFEM2DEdge1.isSame(edgeTria[i]));
+                }
+
+                if (!flag) {
+
+                    double l = edgeTria[i].getLength();
+
+                    boolean flagNode = false;
+                    for (Iterator<PFEM2DNode> it3 = this.nodes.iterator(); it3.hasNext() && !flagNode;) {
+                        PFEM2DNode nodeCurrent = it3.next();
+
+                        double l2 = nodeCurrent.getDistanceTo(edgeTria[i].getNode(0));
+                        double l3 = nodeCurrent.getDistanceTo(edgeTria[i].getNode(1));
+
+                        double lTot = Math.pow(l2, 2) + Math.pow(l3, 2);
+
+                        if (lTot <= Math.pow(l, 2)) {
+
+                            edgeEncroached.add(edgeTria[i]);
+                            System.out.println("adding encroached edge " + edgeTria[i].toString());
+
+                        }
+
+
+
+                    }
+
+                }
+
+
+            }
+
+
+
+
+        }
